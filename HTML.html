@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>MoneyFlow • บันทึกรายรับรายจ่าย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== LOADING OVERLAY ===================== -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>กำลังโหลด MoneyFlow...</p>
+  </div>
+
+  <!-- ===================== AMBIENT BACKGROUND ===================== -->
+  <div class="ambient-bg" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <!-- ===================== AUTH SCREEN ===================== -->
+  <div id="authScreen" class="auth-screen hidden">
+    <div class="auth-card glass-card">
+      <div class="auth-logo">
+        <span class="logo-mark">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 24C7 24 7 14 12 14C17 14 17 20 22 20C27 20 27 11 31 11" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="g1" x1="3" y1="11" x2="31" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#c084fc"/></linearGradient></defs>
+          </svg>
+        </span>
+        <span class="logo-text"><span class="grad-text">Money</span>Flow</span>
+      </div>
+      <p class="auth-subtitle">บันทึกรายรับ-รายจ่ายอัจฉริยะ จัดการเงินของคุณให้ไหลลื่น</p>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-tab="login">เข้าสู่ระบบ</button>
+        <button type="button" class="auth-tab" data-tab="register">สมัครสมาชิก</button>
+      </div>
+
+      <form id="loginForm" class="auth-form active">
+        <label class="field-label" for="loginEmail">อีเมล</label>
+        <input type="email" id="loginEmail" class="field-input" placeholder="you@example.com" required autocomplete="email">
+
+        <label class="field-label" for="loginPassword">รหัสผ่าน</label>
+        <input type="password" id="loginPassword" class="field-input" placeholder="••••••••" required autocomplete="current-password">
+
+        <p class="auth-error" id="loginError"></p>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="btn-label">เข้าสู่ระบบ</span>
+          <span class="btn-spinner hidden"></span>
+        </button>
+      </form>
+
+      <form id="registerForm" class="auth-form">
+        <label class="field-label" for="registerName">ชื่อที่แสดง</label>
+        <input type="text" id="registerName" class="field-input" placeholder="ชื่อของคุณ" autocomplete="name">
+
+        <label class="field-label" for="registerEmail">อีเมล</label>
+        <input type="email" id="registerEmail" class="field-input" placeholder="you@example.com" required autocomplete="email">
+
+        <label class="field-label" for="registerPassword">รหัสผ่าน</label>
+        <input type="password" id="registerPassword" class="field-input" placeholder="อย่างน้อย 6 ตัวอักษร" required autocomplete="new-password">
+
+        <label class="field-label" for="registerPasswordConfirm">ยืนยันรหัสผ่าน</label>
+        <input type="password" id="registerPasswordConfirm" class="field-input" placeholder="••••••••" required autocomplete="new-password">
+
+        <p class="auth-error" id="registerError"></p>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="btn-label">สมัครสมาชิก</span>
+          <span class="btn-spinner hidden"></span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== APP SHELL ===================== -->
+  <div id="appShell" class="app-shell hidden">
+
+    <!-- Sidebar (desktop) -->
+    <aside class="sidebar glass-card">
+      <div class="sidebar-logo">
+        <span class="logo-mark small">
+          <svg width="26" height="26" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 24C7 24 7 14 12 14C17 14 17 20 22 20C27 20 27 11 31 11" stroke="url(#g2)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="g2" x1="3" y1="11" x2="31" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#c084fc"/></linearGradient></defs>
+          </svg>
+        </span>
+        <span class="logo-text"><span class="grad-text">Money</span>Flow</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">📊</span><span class="nav-label">แดชบอร์ด</span>
+        </button>
+        <button class="nav-item" data-page="transactions">
+          <span class="nav-icon">💸</span><span class="nav-label">รายรับ-รายจ่าย</span>
+        </button>
+        <button class="nav-item" data-page="goals">
+          <span class="nav-icon">🎯</span><span class="nav-label">เป้าหมาย</span>
+        </button>
+        <button class="nav-item" data-page="calendar">
+          <span class="nav-icon">📅</span><span class="nav-label">ปฏิทิน</span>
+        </button>
+        <button class="nav-item" data-page="stats">
+          <span class="nav-icon">📈</span><span class="nav-label">สถิติ</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <span class="user-avatar" id="sidebarAvatar">?</span>
+          <span class="user-email" id="sidebarEmail">-</span>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost btn-block">ออกจากระบบ</button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <h1 class="page-title" id="pageTitle">แดชบอร์ด</h1>
+          <p class="topbar-date" id="topbarDate"></p>
+        </div>
+        <div class="topbar-streak" id="topbarStreak" title="วันบันทึกต่อเนื่อง">
+          <span class="streak-flame">🔥</span><span id="topbarStreakValue">0</span>
+        </div>
+      </header>
+
+      <!-- PAGE: DASHBOARD -->
+      <section id="page-dashboard" class="page active">
+        <div class="stats-grid">
+          <div class="stat-card glass-card stat-income">
+            <span class="stat-icon">📈</span>
+            <span class="stat-label">รายรับทั้งหมด</span>
+            <span class="stat-value" id="statIncome">฿0</span>
+          </div>
+          <div class="stat-card glass-card stat-expense">
+            <span class="stat-icon">📉</span>
+            <span class="stat-label">รายจ่ายทั้งหมด</span>
+            <span class="stat-value" id="statExpense">฿0</span>
+          </div>
+          <div class="stat-card glass-card stat-balance">
+            <span class="stat-icon">💎</span>
+            <span class="stat-label">ยอดคงเหลือ</span>
+            <span class="stat-value" id="statBalance">฿0</span>
+          </div>
+          <div class="stat-card glass-card stat-days">
+            <span class="stat-icon">🗂️</span>
+            <span class="stat-label">วันที่บันทึกข้อมูล</span>
+            <span class="stat-value" id="statDaysRecorded">0 วัน</span>
+          </div>
+          <div class="stat-card glass-card stat-streak">
+            <span class="stat-icon">🔥</span>
+            <span class="stat-label">บันทึกต่อเนื่อง</span>
+            <span class="stat-value" id="statStreak">0 วัน</span>
+          </div>
+        </div>
+
+        <div class="dashboard-bottom-grid">
+          <div class="glass-card panel" id="dashboardGoalPanel">
+            <div class="panel-header">
+              <h2>เป้าหมายปัจจุบัน</h2>
+              <button class="link-btn" data-goto="goals">ดูทั้งหมด ›</button>
+            </div>
+            <div id="dashboardGoalContent" class="dashboard-goal-content">
+              <p class="empty-hint">ยังไม่มีเป้าหมาย ลองตั้งเป้าหมายแรกของคุณดูสิ</p>
+            </div>
+          </div>
+
+          <div class="glass-card panel" id="dashboardRecentPanel">
+            <div class="panel-header">
+              <h2>รายการล่าสุด</h2>
+              <button class="link-btn" data-goto="transactions">ดูทั้งหมด ›</button>
+            </div>
+            <ul class="tx-list" id="recentTransactionsList">
+              <li class="empty-hint">ยังไม่มีรายการ เริ่มบันทึกรายการแรกกันเลย</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: TRANSACTIONS -->
+      <section id="page-transactions" class="page">
+        <div class="page-header">
+          <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-filter="all">ทั้งหมด</button>
+            <button class="filter-tab" data-filter="income">รายรับ</button>
+            <button class="filter-tab" data-filter="expense">รายจ่าย</button>
+          </div>
+          <button class="btn btn-primary" id="openAddTransactionBtn">+ เพิ่มรายการ</button>
+        </div>
+
+        <div class="glass-card panel">
+          <ul class="tx-list tx-list-full" id="transactionsList">
+            <li class="empty-hint" id="transactionsEmpty">ยังไม่มีรายการ กดปุ่ม "เพิ่มรายการ" เพื่อเริ่มบันทึก</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- PAGE: GOALS -->
+      <section id="page-goals" class="page">
+        <div class="glass-card panel goal-current-card" id="currentGoalCard">
+          <p class="empty-hint">ยังไม่มีเป้าหมายการเก็บเงิน ตั้งเป้าหมายแรกของคุณด้านล่างได้เลย</p>
+        </div>
+
+        <div class="glass-card panel">
+          <div class="panel-header"><h2>ตั้งเป้าหมายใหม่</h2></div>
+          <form id="goalForm" class="goal-form">
+            <label class="field-label" for="goalTitleInput">ชื่อเป้าหมาย</label>
+            <input type="text" id="goalTitleInput" class="field-input" placeholder="เช่น ทุนเที่ยวญี่ปุ่น" required>
+
+            <label class="field-label" for="goalTargetInput">ยอดเป้าหมาย (บาท)</label>
+            <input type="number" id="goalTargetInput" class="field-input" placeholder="0" min="1" step="0.01" required>
+
+            <button type="submit" class="btn btn-primary btn-block">ตั้งเป้าหมาย</button>
+          </form>
+        </div>
+
+        <div class="glass-card panel">
+          <div class="panel-header"><h2>ประวัติเป้าหมาย</h2></div>
+          <ul class="goal-history-list" id="goalHistoryList">
+            <li class="empty-hint">ยังไม่มีประวัติเป้าหมาย</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- PAGE: CALENDAR -->
+      <section id="page-calendar" class="page">
+        <div class="glass-card panel">
+          <div class="calendar-header">
+            <button class="icon-btn" id="calPrevBtn" aria-label="เดือนก่อนหน้า">‹</button>
+            <h2 id="calMonthLabel">-</h2>
+            <button class="icon-btn" id="calNextBtn" aria-label="เดือนถัดไป">›</button>
+          </div>
+          <div class="calendar-weekdays">
+            <span>อา</span><span>จ</span><span>อ</span><span>พ</span><span>พฤ</span><span>ศ</span><span>ส</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <div class="calendar-legend">
+            <span><i class="legend-dot legend-recorded"></i> มีการบันทึก</span>
+            <span><i class="legend-dot legend-none"></i> ไม่มีรายการ</span>
+            <span><i class="legend-dot legend-missing"></i> ไม่ได้บันทึก</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: STATS -->
+      <section id="page-stats" class="page">
+        <div class="page-header">
+          <h2 class="section-subtitle">เลือกปี</h2>
+          <select id="statsYearSelect" class="field-input field-select"></select>
+        </div>
+
+        <div class="glass-card panel chart-card">
+          <h2>รายรับ-รายจ่ายรายเดือน</h2>
+          <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
+        </div>
+
+        <div class="glass-card panel chart-card">
+          <h2>รายรับ-รายจ่ายรายปี</h2>
+          <div class="chart-wrap"><canvas id="yearlyChart"></canvas></div>
+        </div>
+
+        <div class="stats-summary-grid">
+          <div class="summary-card glass-card">
+            <span class="stat-icon">🧮</span>
+            <span class="stat-label">กำไรสุทธิทั้งหมด</span>
+            <span class="stat-value" id="netProfitValue">฿0</span>
+          </div>
+          <div class="summary-card glass-card">
+            <span class="stat-icon">🏆</span>
+            <span class="stat-label">เดือนที่รายรับสูงสุด</span>
+            <span class="stat-value" id="topIncomeMonthValue">-</span>
+          </div>
+          <div class="summary-card glass-card">
+            <span class="stat-icon">⚠️</span>
+            <span class="stat-label">เดือนที่รายจ่ายสูงสุด</span>
+            <span class="stat-value" id="topExpenseMonthValue">-</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom nav (mobile) -->
+    <nav class="bottom-nav glass-card">
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span><span class="nav-label">หน้าหลัก</span></button>
+      <button class="nav-item" data-page="transactions"><span class="nav-icon">💸</span><span class="nav-label">รายการ</span></button>
+      <button class="nav-item" data-page="goals"><span class="nav-icon">🎯</span><span class="nav-label">เป้าหมาย</span></button>
+      <button class="nav-item" data-page="calendar"><span class="nav-icon">📅</span><span class="nav-label">ปฏิทิน</span></button>
+      <button class="nav-item" data-page="stats"><span class="nav-icon">📈</span><span class="nav-label">สถิติ</span></button>
+    </nav>
+  </div>
+
+  <!-- ===================== MODAL: ADD/EDIT TRANSACTION ===================== -->
+  <div id="transactionModal" class="modal-overlay hidden">
+    <div class="modal glass-card">
+      <div class="modal-head">
+        <h2 id="transactionModalTitle">เพิ่มรายการ</h2>
+        <button class="icon-btn modal-close" aria-label="ปิด">✕</button>
+      </div>
+      <form id="transactionForm">
+        <input type="hidden" id="transactionIdInput">
+        <div class="type-toggle">
+          <button type="button" class="type-btn type-income active" data-type="income">รายรับ</button>
+          <button type="button" class="type-btn type-expense" data-type="expense">รายจ่าย</button>
+        </div>
+
+        <label class="field-label" for="transactionAmount">จำนวนเงิน (บาท)</label>
+        <input type="number" id="transactionAmount" class="field-input" placeholder="0.00" min="0.01" step="0.01" required>
+
+        <label class="field-label" for="transactionNote">รายละเอียด</label>
+        <input type="text" id="transactionNote" class="field-input" placeholder="เช่น ค่าข้าวเที่ยง" required>
+
+        <label class="field-label" for="transactionDate">วันที่</label>
+        <input type="date" id="transactionDate" class="field-input" required>
+
+        <p class="auth-error" id="transactionError"></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-danger hidden" id="transactionDeleteBtn">ลบรายการ</button>
+          <button type="submit" class="btn btn-primary">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: CALENDAR DAY ACTION ===================== -->
+  <div id="calendarDayModal" class="modal-overlay hidden">
+    <div class="modal glass-card modal-sm">
+      <div class="modal-head">
+        <h2 id="calendarDayTitle">วันที่</h2>
+        <button class="icon-btn modal-close" aria-label="ปิด">✕</button>
+      </div>
+      <p class="modal-desc" id="calendarDayStatusText"></p>
+      <div class="modal-actions modal-actions-col">
+        <button class="btn btn-primary btn-block" id="calLogDataBtn">บันทึกข้อมูลวันนี้</button>
+        <button class="btn btn-secondary btn-block" id="calMarkNoneBtn">ไม่มีรายการวันนี้</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: GOAL CELEBRATION ===================== -->
+  <div id="celebrationModal" class="modal-overlay hidden">
+    <div class="modal glass-card modal-sm celebration-modal">
+      <div class="celebration-icon">🎉</div>
+      <h2>ยินดีด้วย!</h2>
+      <p id="celebrationText">คุณทำสำเร็จตามเป้าหมายแล้ว</p>
+      <button class="btn btn-primary btn-block modal-close">เยี่ยมมาก!</button>
+    </div>
+  </div>
+
+  <canvas id="fxCanvas"></canvas>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
